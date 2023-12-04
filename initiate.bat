@@ -7,9 +7,9 @@ title Gelbooru Downloader
 
 node -v >nul 2>&1
 if %errorlevel% neq 0 (
-    echo NodeJS is not installed. Attempting to install.
-    call installp.bat
-    echo NodeJS installed. Proceeding ...
+    echo NodeJS is not installed. Please install NodeJS and NPM.
+    pause
+    exit
 )
 
 @REM Run npm install and npm build
