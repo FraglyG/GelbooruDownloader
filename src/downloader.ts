@@ -79,7 +79,7 @@ type DownloadCallbackFunction = (image: GelbooruImage, path: string, fileSize: n
 
 async function downloadImage(image: GelbooruImage, location: string, cb: DownloadCallbackFunction) {
     const url = image.file_url;
-    const response = await axios.get(url, { responseType: 'stream', timeout: 15 * 1000 });
+    const response = await axios.get(url, { responseType: 'stream', timeout: 5 * 1000 });
 
     if (response.status != 200) {
         erase()
