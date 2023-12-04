@@ -82,6 +82,7 @@ async function downloadImage(image: GelbooruImage, location: string, cb: Downloa
     const response = await axios.get(url, { responseType: 'stream', timeout: 5 * 1000 });
 
     if (response.status != 200) {
+        erase()
         throw new Error(`Error downloading image: ${image.id} with error: ${response.status} - ${response.statusText}`);
     }
 
@@ -104,10 +105,15 @@ async function downloadImageRobust(image: GelbooruImage, location: string, cb: D
             break
         } catch (error) {
             retires++;
+            erase()
             log.red(`Error downloading image: ${image.id} with error: ${error}\nRetrtying...`);
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
     }
+}
+
+function erase() {
+    process.stdout.write("\r\x1b[K")
 }
 
 export async function downloadImages(tags: string[], downloadCount: number | undefined, cb: DownloadCallbackFunction) {
@@ -120,6 +126,7 @@ export async function downloadImages(tags: string[], downloadCount: number | und
     const { attribute } = await searchTags(tags);
 
     if (!attribute) {
+        erase()
         log.red('Something went wrong..');
         return;
     }
@@ -138,11 +145,13 @@ export async function downloadImages(tags: string[], downloadCount: number | und
         const { attribute, images } = await searchTags(tags, page, imageLimit);
 
         if (!attribute) {
+            erase()
             log.red("Couldn't connect to Gelbooru, Exiting Download.");
             break;
         }
 
         if (!images || images.length === 0) {
+            erase()
             console.log('No images found on this page. Exiting Download.');
             break;
         }
@@ -153,6 +162,7 @@ export async function downloadImages(tags: string[], downloadCount: number | und
             try {
                 await downloadImageRobust(image, location, cb);
             } catch (error) {
+                erase()
                 log.red(`Error downloading image: ${image.id} with error: ${error}`);
             }
         };
@@ -160,6 +170,7 @@ export async function downloadImages(tags: string[], downloadCount: number | und
         try {
             await Promise.all(images.map((image) => download(image)));
         } catch (error) {
+            erase()
             log.red(`Error downloading images: ${error}`);
         }
 
