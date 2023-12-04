@@ -169,6 +169,11 @@ export async function downloadImages(tags: string[], downloadCount: number | und
     }
 }
 
+// make sure auth file exists
+if (!fs.existsSync(path.join(process.cwd(), "auth.txt"))) {
+    fs.writeFileSync(path.join(process.cwd(), "auth.txt"), "")
+}
+
 export function hasAuthText() {
     auth = fs.readFileSync(path.join(process.cwd(), "auth.txt"), "utf-8")
     return auth != ""
