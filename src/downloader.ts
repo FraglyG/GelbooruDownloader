@@ -100,7 +100,7 @@ async function downloadImageRobust(image: GelbooruImage, location: string, cb: D
 
     while (retires < maxRetries) {
         try {
-            await downloadImageRobust(image, location, cb);
+            await downloadImage(image, location, cb);
             break
         } catch (error) {
             retires++;
