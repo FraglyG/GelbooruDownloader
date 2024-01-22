@@ -191,18 +191,18 @@ export async function downloadImages(tags: string[], downloadCount: number | und
         };
 
         try {
-            // split the images in 10 chunks and download them
-            const chunkSize = 10;
+            // split the images in 20 chunks and download them
+            const chunkSize = 20;
             const chunks = [];
             for (let i = 0; i < images.length; i += chunkSize) {
                 chunks.push(images.slice(i, i + chunkSize));
             }
 
-            // download the 10 batches in parallel, but in each batch, download the images sequentially with a 500 ms break between each
+            // download the batches in parallel, but in each batch, download the images sequentially with a 500 ms break between each
             await Promise.all(chunks.map(async (chunk) => {
                 for (const image of chunk) {
                     await download(image);
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await new Promise(resolve => setTimeout(resolve, 250));
                 }
             }));
         } catch (error) {
