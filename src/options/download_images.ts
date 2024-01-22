@@ -1,14 +1,13 @@
-import chalk from "chalk"
+import colors from "colors"
 import cliProgress from "cli-progress"
 import { OptionReturn, convertBytesToBestFit, qio } from "../index.js"
 import { downloadImages, searchTags } from "../downloader.js"
 import log from "../log.js"
-import { settings } from "./settings.js"
 
 export function createProgess(min: number, max: number, current: number) {
     const bar = new cliProgress.SingleBar({
-        format: "Downloading |" + chalk.cyan("{bar}") + "| " + chalk.blueBright("{percentage}%") + " || " +
-            chalk.greenBright("{value}") + "/" + chalk.green("{total}") + " Images " +
+        format: "Downloading |" + colors.cyan("{bar}") + "| " + colors.blue("{percentage}%") + " || " +
+            colors.green("{value}") + "/" + colors.green("{total}") + " Images " +
             "( {imagesPerSecond} images/s | {downloadSpeed} )",
         hideCursor: true,
     }, cliProgress.Presets.shades_classic)

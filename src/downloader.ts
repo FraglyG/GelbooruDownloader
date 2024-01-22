@@ -2,7 +2,8 @@ import axios, { AxiosError } from "axios"
 import path from "path"
 import fs from "fs"
 import log from "./log.js"
-import { settings } from "./options/settings.js"
+import { getSettings } from "./options/settings.js"
+import Downloader from "nodejs-file-downloader"
 
 let auth = fs.readFileSync(path.join(process.cwd(), "auth.txt"), "utf-8")
 
@@ -96,19 +97,40 @@ async function downloadImage(image: GelbooruImage, location: string, cb: Downloa
 }
 
 async function downloadImageRobust(image: GelbooruImage, location: string, cb: DownloadCallbackFunction) {
-    let retires = 0;
-    const maxRetries = 3;
+    // let retires = 0;
+    // const maxRetries = 3;
 
-    while (retires < maxRetries) {
-        try {
-            await downloadImage(image, location, cb);
-            break
-        } catch (error) {
-            retires++;
-            erase()
-            log.red(`Error downloading image: ${image.id} with error: ${error}\nRetrtying...`);
-            await new Promise(resolve => setTimeout(resolve, 1000));
+    // while (retires < maxRetries) {
+    //     try {
+    //         await downloadImage(image, location, cb);
+    //         break
+    //     } catch (error) {
+    //         retires++;
+    //         erase()
+    //         log.red(`Error downloading image: ${image.id} with error: ${error}\nRetrtying...`);
+    //         await new Promise(resolve => setTimeout(resolve, 1000));
+    //     }
+    // }
+
+    const fileName = `${image.id}${path.extname(image.file_url)}`
+    const downloader = new Downloader({
+        url: image.file_url,
+        fileName: fileName,
+        directory: location,
+        cloneFiles: false,
+        onResponse(r) {
+            cb(image, path.join(location, fileName), parseInt(r.headers['content-length'] as string, 10));
+        },
+        maxAttempts: 5
+    });
+
+    try {
+        const { downloadStatus } = await downloader.download();
+        if (downloadStatus == "ABORTED") {
+            log.red("Failed to download image " + image.id + " after 5 attempts");
         }
+    } catch (error) {
+        log.red(`Error downloading image: ${image.id} with error: ${error}`);
     }
 }
 
@@ -117,6 +139,7 @@ function erase() {
 }
 
 export async function downloadImages(tags: string[], downloadCount: number | undefined, cb: DownloadCallbackFunction) {
+    const settings = await getSettings()
     const location = path.join(settings.location, tags.join('_'));
 
     if (!fs.existsSync(location)) {
@@ -168,7 +191,20 @@ export async function downloadImages(tags: string[], downloadCount: number | und
         };
 
         try {
-            await Promise.all(images.map((image) => download(image)));
+            // split the images in 10 chunks and download them
+            const chunkSize = 10;
+            const chunks = [];
+            for (let i = 0; i < images.length; i += chunkSize) {
+                chunks.push(images.slice(i, i + chunkSize));
+            }
+
+            // download the 10 batches in parallel, but in each batch, download the images sequentially with a 500 ms break between each
+            await Promise.all(chunks.map(async (chunk) => {
+                for (const image of chunk) {
+                    await download(image);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }));
         } catch (error) {
             erase()
             log.red(`Error downloading images: ${error}`);

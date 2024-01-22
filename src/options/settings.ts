@@ -6,15 +6,21 @@ import path from "path"
 import { QuickDB } from "quick.db"
 export const db = new QuickDB();
 
-export let settings = {
-    location: await db.get("location") || path.join(process.cwd(), "downloads"),
-}
+export async function getSettings() {
+    let settings = {
+        location: await db.get("location") || path.join(process.cwd(), "downloads"),
+    }
 
-if (!fs.existsSync(settings.location)) {
-    fs.mkdirSync(settings.location, { recursive: true })
+    if (!fs.existsSync(settings.location)) {
+        fs.mkdirSync(settings.location, { recursive: true })
+    }
+
+    return settings;
 }
 
 export default async function settingsOption(): Promise<OptionReturn> {
+    const settings = await getSettings()
+
     while (true) {
         console.clear()
         const option = await qio(`Options:\n\n1. Change download location [Current: '${settings.location}']\n` +
@@ -34,10 +40,6 @@ export default async function settingsOption(): Promise<OptionReturn> {
         } else if (option == "2") {
             break
         }
-    }
-
-    settings = {
-        location: await db.get("location") || path.join(process.cwd(), "downloads"),
     }
 
     return { lastLog: "Settings saved!", logType: "green" }

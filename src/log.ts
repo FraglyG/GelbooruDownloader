@@ -1,49 +1,49 @@
-import chalk from "chalk"
+import colors from "colors"
 
-function green(...stuff: any[]) {
-    console.log(chalk.green(...stuff))
+function green(stuff: string) {
+    console.log(colors.green(stuff))
 }
 
-function blue(...stuff: any[]) {
-    console.log(chalk.blue(...stuff))
+function blue(stuff: string) {
+    console.log(colors.blue(stuff))
 }
 
-function red(...stuff: any[]) {
-    console.log(chalk.red(...stuff))
+function red(stuff: string) {
+    console.log(colors.red(stuff))
 }
 
-function yellow(...stuff: any[]) {
-    console.log(chalk.yellow(...stuff))
+function yellow(stuff: string) {
+    console.log(colors.yellow(stuff))
 }
 
-function cyan(...stuff: any[]) {
-    console.log(chalk.cyan(...stuff))
+function cyan(stuff: string) {
+    console.log(colors.cyan(stuff))
 }
 
-function magenta(...stuff: any[]) {
-    console.log(chalk.magenta(...stuff))
+function magenta(stuff: string) {
+    console.log(colors.magenta(stuff))
 }
 
-function white(...stuff: any[]) {
-    console.log(chalk.white(...stuff))
+function white(stuff: string) {
+    console.log(colors.white(stuff))
 }
 
-function black(...stuff: any[]) {
-    console.log(chalk.black(...stuff))
+function black(stuff: string) {
+    console.log(colors.black(stuff))
 }
 
-function gray(...stuff: any[]) {
-    console.log(chalk.gray(...stuff))
+function gray(stuff: string) {
+    console.log(colors.gray(stuff))
 }
 
-function grey(...stuff: any[]) {
-    console.log(chalk.grey(...stuff))
+function grey(stuff: string) {
+    console.log(colors.grey(stuff))
 }
 
 /// other
 
 function line() {
-    console.log(chalk.gray("--------------------------------------------------"))
+    console.log(colors.gray("--------------------------------------------------"))
 }
 
 function space() {

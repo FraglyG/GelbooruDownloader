@@ -4,7 +4,7 @@ import log from "./log.js"
 import { hasAuthText, saveAuthText } from "./downloader.js"
 
 import downloadOption from "./options/download_images.js"
-import settingsOption, { settings } from "./options/settings.js"
+import settingsOption from "./options/settings.js"
 
 export function qio(question: string): Promise<string> {
     const rl = readline.createInterface({
