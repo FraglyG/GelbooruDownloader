@@ -38,6 +38,7 @@ export default async function downloadOption(): Promise<OptionReturn> {
     log.green(`Found ${results.attribute.count} images matching those tags!`)
 
     let size = 0
+    let sizeArray: { size: number, created: number }[] = []
 
     // IMAGE DOWNLOAD
     const download = await qio("Download images? [y/n] (TIP: you can respond with a number instead to download specific amount of images)")
@@ -51,6 +52,7 @@ export default async function downloadOption(): Promise<OptionReturn> {
         log.blue(`Downloading ${countText}images...`)
 
         let downloadedImages = 0
+        let downloadedImagesArray: { created: number }[] = []
 
         const bar = createProgess(0, totalAmountDownload, 0)
         const started = Date.now()
@@ -58,13 +60,27 @@ export default async function downloadOption(): Promise<OptionReturn> {
         try {
             await downloadImages(tagList, downloadNumberProvide, async (image, path, fileSize) => {
                 const now = Date.now()
+                const startCheck = now - 5_000 // 5 seconds ago
 
+                // Add new metric data
+                sizeArray.push({ size: fileSize, created: now })
+                downloadedImagesArray.push({ created: now })
+
+                // Remove Old Metric Data
+                sizeArray = sizeArray.filter((x) => x.created > startCheck)
+                downloadedImagesArray = downloadedImagesArray.filter((x) => x.created > startCheck)
+
+                // Add counter
                 size += fileSize
                 downloadedImages++
 
+                // Get Bar Metrics
+                const bitAgoSizes = sizeArray.reduce((a, b) => a + b.size, 0)
+                const bitAgoDownloadedImages = downloadedImagesArray.length
+
                 bar.increment(1, {
-                    downloadSpeed: convertBytesToBestFit(size / ((now - started) / 1000)) + "/s",
-                    imagesPerSecond: (downloadedImages / ((now - started) / 1000)).toFixed(2),
+                    downloadSpeed: convertBytesToBestFit(bitAgoSizes / ((now - startCheck) / 1000)) + "/s",
+                    imagesPerSecond: (bitAgoDownloadedImages / ((now - startCheck) / 1000)).toFixed(2),
                 })
             })
         } catch (error) {
